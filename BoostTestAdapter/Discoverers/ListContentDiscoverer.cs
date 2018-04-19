@@ -88,7 +88,7 @@ namespace BoostTestAdapter.Discoverers
                 }
                 catch (Exception ex)
                 {
-                    Logger.Exception(ex, Resources.WorkingDirectoryNotFound);
+                    Logger.Debug(Resources.WorkingDirectoryNotFoundEx, ex.Message);
                 }
 
                 try

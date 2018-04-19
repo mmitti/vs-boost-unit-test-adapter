@@ -457,6 +457,15 @@ namespace BoostTestAdapter {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not find parent Visual Studio instance..
+        /// </summary>
+        internal static string VSProcessNotFound {
+            get {
+                return ResourceManager.GetString("VSProcessNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Working directory: {0}.
         /// </summary>
         internal static string WorkingDirectory {

@@ -440,7 +440,7 @@ namespace BoostTestAdapter
             }
             catch (Exception ex)
             {
-                Logger.Exception(ex, Resources.WorkingDirectoryNotFoundEx, ex.Message);
+                Logger.Debug(Resources.WorkingDirectoryNotFoundEx, ex.Message);
             }
         }
 
