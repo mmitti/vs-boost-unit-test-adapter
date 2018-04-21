@@ -176,7 +176,7 @@
         <Str Cat="Text">
           <Val><![CDATA[Finding processes spawned by process with Id [{0}]5D;]]></Val>
           <Tgt Cat="Text" Stat="Loc" Orig="New">
-            <Val><![CDATA[查找由 ID 为 [{0}]5D; 的进程衍生的进程]]></Val>
+            <Val><![CDATA[查找由 ID 为 [{0}]5D; 的进程生成的进程]]></Val>
           </Tgt>
         </Str>
         <Disp Icon="Str" />
@@ -445,7 +445,7 @@
     <Disp Icon="Ver" Disp="true" LocTbl="false" Path=" \ ;Version \ 8 \ 0" />
     <Item ItemId=";AssemblyVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.8.3]]></Val>
+        <Val><![CDATA[1.0.8.4]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -460,7 +460,7 @@
     </Item>
     <Item ItemId=";FileVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.8.3]]></Val>
+        <Val><![CDATA[1.0.8.4]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
@@ -496,7 +496,7 @@
     </Item>
     <Item ItemId=";ProductVersion" ItemType="0" PsrId="211" Leaf="true">
       <Str Cat="Text" DevLk="true">
-        <Val><![CDATA[1.0.8.3]]></Val>
+        <Val><![CDATA[1.0.8.4]]></Val>
       </Str>
       <Disp Icon="Str" />
     </Item>
