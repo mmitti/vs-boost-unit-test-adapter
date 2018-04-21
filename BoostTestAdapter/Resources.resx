@@ -313,7 +313,4 @@
   <data name="ImageDirectoryEntryToData" xml:space="preserve">
     <value>ImageDirectoryEntryToData failed!</value>
   </data>
-  <data name="VSProcessNotFound" xml:space="preserve">
-    <value>Could not find parent Visual Studio instance.</value>
-  </data>
 </root>
