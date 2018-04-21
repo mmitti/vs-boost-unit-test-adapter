@@ -3,7 +3,7 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-// This file has been modified by Microsoft on 8/2017.
+// This file has been modified by Microsoft on 4/2018.
 
 using BoostTestAdapter.Boost.Results;
 using BoostTestAdapter.Boost.Runner;
@@ -187,6 +187,9 @@ namespace BoostTestAdapter
             Logger.Debug("IRunContext.RunSettings.SettingsXml: {0}", runContext.RunSettings.SettingsXml);
 
             BoostTestAdapterSettings settings = BoostTestAdapterSettingsProvider.GetSettings(runContext);
+            RunSettingsProvider runSettings = runContext.RunSettings.GetSettings(BoostTestSettingsConstants.InternalSettingsName) as RunSettingsProvider;
+            if(runSettings != null)
+                settings.ParentVSProcessId = runSettings.VSProcessId;
 
             foreach (string source in sources)
             {
@@ -260,6 +263,9 @@ namespace BoostTestAdapter
             Logger.Debug("IRunContext.RunSettings.SettingsXml: {0}", runContext.RunSettings.SettingsXml);
 
             BoostTestAdapterSettings settings = BoostTestAdapterSettingsProvider.GetSettings(runContext);
+            RunSettingsProvider runSettings = runContext.RunSettings.GetSettings(BoostTestSettingsConstants.InternalSettingsName) as RunSettingsProvider;
+            if (runSettings != null)
+                settings.ParentVSProcessId = runSettings.VSProcessId;
 
             // Batch tests into grouped runs based on test source and test suite so that we minimize symbol reloading
             //
@@ -338,6 +344,9 @@ namespace BoostTestAdapter
         private void RunBoostTests(IEnumerable<TestRun> testBatches, IRunContext runContext, IFrameworkHandle frameworkHandle)
         {
             BoostTestAdapterSettings settings = BoostTestAdapterSettingsProvider.GetSettings(runContext);
+            RunSettingsProvider runSettings = runContext.RunSettings.GetSettings(BoostTestSettingsConstants.InternalSettingsName) as RunSettingsProvider;
+            if (runSettings != null)
+                settings.ParentVSProcessId = runSettings.VSProcessId;
 
             foreach (TestRun batch in testBatches)
             {
@@ -433,7 +442,7 @@ namespace BoostTestAdapter
         {
             try
             {
-                using (var packageService = _packageServiceFactory.Create())
+                using (var packageService = _packageServiceFactory.Create(settings.ParentVSProcessId))
                 {
                     args.SetWorkingEnvironment(source, settings, packageService);
                 }

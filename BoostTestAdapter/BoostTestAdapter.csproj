@@ -129,6 +129,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Settings\BoostTestInternalSettings.cs" />
     <Compile Include="Utility\BoostDataTestCaseVerifier.cs" />
     <Compile Include="Utility\VisualStudio\DefaultBoostTestPackageServiceFactory.cs" />
     <Compile Include="Utility\VisualStudio\IBoostTestPackageServiceFactory.cs" />
@@ -187,6 +188,9 @@
     </PackageReference>
     <PackageReference Include="Microsoft.TestPlatform.ObjectModel">
       <Version>15.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.TestWindow.Interfaces">
+      <Version>15.8.0-preview-1604913</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

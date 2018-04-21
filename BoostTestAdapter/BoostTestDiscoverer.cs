@@ -3,7 +3,7 @@
 // (See accompanying file LICENSE_1_0.txt or copy at
 // http://www.boost.org/LICENSE_1_0.txt)
 
-// This file has been modified by Microsoft on 8/2017.
+// This file has been modified by Microsoft on 4/2018.
 
 using BoostTestAdapter.Discoverers;
 using BoostTestAdapter.Settings;
@@ -110,6 +110,9 @@ namespace BoostTestAdapter
                 return;
 
             BoostTestAdapterSettings settings = BoostTestAdapterSettingsProvider.GetSettings(discoveryContext);
+            RunSettingsProvider runSettings = discoveryContext.RunSettings.GetSettings(BoostTestSettingsConstants.InternalSettingsName) as RunSettingsProvider;
+            if (runSettings != null)
+                settings.ParentVSProcessId = runSettings.VSProcessId;
 
             try
             {
