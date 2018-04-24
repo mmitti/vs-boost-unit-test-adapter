@@ -15,7 +15,7 @@ namespace VisualStudioAdapter
     /// </summary>
     class Project
     {
-        private readonly EnvDTE.Project _project;
+        private EnvDTE.Project _project = null;
         private ProjectConfiguration _configuration = null;
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace VisualStudioAdapter
                 if (vcProj != null)
                 {
                     var configs = vcProj.Configurations as IVCCollection;
-                    if (configs != null && ActiveConfigurationName != null)
+                    if (configs != null)
                     {
                         return configs.Item(ActiveConfigurationName) as VCConfiguration;
                     }
@@ -77,9 +77,7 @@ namespace VisualStudioAdapter
         {
             get
             {
-                //return this._project.ConfigurationManager.ActiveConfiguration.ConfigurationName + "|" + this._project.ConfigurationManager.ActiveConfiguration.PlatformName;
-                var activeConfiguration = this._project.ConfigurationManager?.ActiveConfiguration;
-                return activeConfiguration == null ? null : (activeConfiguration.ConfigurationName + "|" + activeConfiguration.PlatformName);
+                return this._project.ConfigurationManager.ActiveConfiguration.ConfigurationName + "|" + this._project.ConfigurationManager.ActiveConfiguration.PlatformName;
             }
         }
 
