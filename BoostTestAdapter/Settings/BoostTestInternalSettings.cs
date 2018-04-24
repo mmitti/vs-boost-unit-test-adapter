@@ -82,7 +82,6 @@ namespace BoostTestAdapter.Settings
         public void Load(XmlReader reader)
         {
             Utility.Code.Require(reader, "reader");
-            System.Diagnostics.Debugger.Launch();
 
             var schemaSet = new XmlSchemaSet();
             var schemaStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("BoostTestInternalSettings.xsd");
