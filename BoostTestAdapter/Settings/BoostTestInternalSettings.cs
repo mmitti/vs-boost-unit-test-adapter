@@ -1,13 +1,16 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-using System.ComponentModel.Composition;
-using System.Diagnostics;
-using System.Xml;
-using System.Xml.Serialization;
-using Microsoft.VisualStudio.TestWindow.Extensibility;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
+using Microsoft.VisualStudio.TestWindow.Extensibility;
+using System;
+using System.ComponentModel.Composition;
+using System.Diagnostics;
+using System.Reflection;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
 using System.Xml.XPath;
 
 namespace BoostTestAdapter.Settings
@@ -38,8 +41,6 @@ namespace BoostTestAdapter.Settings
             }
 
             var settingsContainer = new RunSettingsContainer();
-
-            runSettingsNavigator.MoveToChild(Constants.RunSettingsName, "");
             runSettingsNavigator.AppendChild(settingsContainer.ToXml().CreateNavigator());
 
             runSettingsNavigator.MoveToRoot();
@@ -80,11 +81,39 @@ namespace BoostTestAdapter.Settings
 
         public void Load(XmlReader reader)
         {
-            if (reader.Read() && reader.Name.Equals(this.Name))
+            Utility.Code.Require(reader, "reader");
+            System.Diagnostics.Debugger.Launch();
+
+            var schemaSet = new XmlSchemaSet();
+            var schemaStream = Assembly.GetExecutingAssembly().GetManifestResourceStream("BoostTestInternalSettings.xsd");
+            schemaSet.Add(null, XmlReader.Create(schemaStream));
+
+            var settings = new XmlReaderSettings
             {
-                var serializer = new XmlSerializer(typeof(RunSettingsContainer));
-                RunSettingsContainer settings = serializer.Deserialize(reader) as RunSettingsContainer;
-                this.VSProcessId = settings.VSProcessId;
+                Schemas = schemaSet,
+                ValidationType = ValidationType.Schema,
+                ValidationFlags = XmlSchemaValidationFlags.ReportValidationWarnings
+            };
+
+            settings.ValidationEventHandler += (object o, ValidationEventArgs e) => throw e.Exception;
+
+            using (var newReader = XmlReader.Create(reader, settings))
+            {
+                try
+                {
+                    if (newReader.Read() && newReader.Name.Equals(this.Name))
+                    {
+                        XmlSerializer deserializer = new XmlSerializer(typeof(RunSettingsContainer));
+                        RunSettingsContainer settingsContainer = deserializer.Deserialize(newReader) as RunSettingsContainer;
+                        this.VSProcessId = settingsContainer.VSProcessId;
+                    }
+                }
+                catch (InvalidOperationException e) when (e.InnerException is XmlSchemaValidationException)
+                {
+                    throw new BoostTestAdapterSettingsProvider.InvalidBoostTestAdapterSettingsException(
+                        String.Format(Resources.InvalidPropertyFile, BoostTestSettingsConstants.InternalSettingsName, e.InnerException.Message),
+                        e.InnerException);
+                }
             }
         }
     }

@@ -187,9 +187,6 @@ namespace BoostTestAdapter
             Logger.Debug("IRunContext.RunSettings.SettingsXml: {0}", runContext.RunSettings.SettingsXml);
 
             BoostTestAdapterSettings settings = BoostTestAdapterSettingsProvider.GetSettings(runContext);
-            RunSettingsProvider runSettings = runContext.RunSettings.GetSettings(BoostTestSettingsConstants.InternalSettingsName) as RunSettingsProvider;
-            if(runSettings != null)
-                settings.ParentVSProcessId = runSettings.VSProcessId;
 
             foreach (string source in sources)
             {
@@ -263,9 +260,6 @@ namespace BoostTestAdapter
             Logger.Debug("IRunContext.RunSettings.SettingsXml: {0}", runContext.RunSettings.SettingsXml);
 
             BoostTestAdapterSettings settings = BoostTestAdapterSettingsProvider.GetSettings(runContext);
-            RunSettingsProvider runSettings = runContext.RunSettings.GetSettings(BoostTestSettingsConstants.InternalSettingsName) as RunSettingsProvider;
-            if (runSettings != null)
-                settings.ParentVSProcessId = runSettings.VSProcessId;
 
             // Batch tests into grouped runs based on test source and test suite so that we minimize symbol reloading
             //
@@ -344,9 +338,6 @@ namespace BoostTestAdapter
         private void RunBoostTests(IEnumerable<TestRun> testBatches, IRunContext runContext, IFrameworkHandle frameworkHandle)
         {
             BoostTestAdapterSettings settings = BoostTestAdapterSettingsProvider.GetSettings(runContext);
-            RunSettingsProvider runSettings = runContext.RunSettings.GetSettings(BoostTestSettingsConstants.InternalSettingsName) as RunSettingsProvider;
-            if (runSettings != null)
-                settings.ParentVSProcessId = runSettings.VSProcessId;
 
             foreach (TestRun batch in testBatches)
             {

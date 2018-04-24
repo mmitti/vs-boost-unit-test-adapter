@@ -110,9 +110,6 @@ namespace BoostTestAdapter
                 return;
 
             BoostTestAdapterSettings settings = BoostTestAdapterSettingsProvider.GetSettings(discoveryContext);
-            RunSettingsProvider runSettings = discoveryContext.RunSettings.GetSettings(BoostTestSettingsConstants.InternalSettingsName) as RunSettingsProvider;
-            if (runSettings != null)
-                settings.ParentVSProcessId = runSettings.VSProcessId;
 
             try
             {
