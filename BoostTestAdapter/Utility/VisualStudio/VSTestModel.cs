@@ -29,24 +29,17 @@ namespace BoostTestAdapter.Utility.VisualStudio
         /// <summary>
         /// TestSuite trait name
         /// </summary>
-        public static string TestSuiteTrait
-        {
-            get
-            {
-                return "TestSuite";
-            }
-        }
-        
+        public static string TestSuiteTrait { get; } = "TestSuite";
+
         /// <summary>
-        /// TestSuite trait name
+        /// Test Status (Enabled/Disabled) trait name
         /// </summary>
-        public static string StatusTrait
-        {
-            get
-            {
-                return "Status";
-            }
-        }
+        public static string StatusTrait { get; } = "Status";
+
+        /// <summary>
+        /// Boost.Test Test Path test property
+        /// </summary>
+        public static TestProperty TestPathProperty { get; } = TestProperty.Register("Boost.Test.Test.Path", "Boost.Test Test Path", typeof(string), typeof(VSTestModel));
 
         private static readonly TestProperty _version = TestProperty.Register("Boost.Test.Boost.Version", "Boost Version", typeof(string), typeof(VSTestModel));
 
@@ -93,6 +86,7 @@ namespace BoostTestAdapter.Utility.VisualStudio
                 return "Disabled";
             }
         }
+
 
         /// <summary>
         /// Converts a Boost.Test.Result.TestResult model into an equivalent
@@ -405,6 +399,25 @@ namespace BoostTestAdapter.Utility.VisualStudio
 
             // Only provide a single memory leak error if the test succeeded successfully (i.e. all asserts passed)
             return (errors.Any() ? errors : result.LogEntries.Where((e) => (e is LogEntryMemoryLeak)).Take(1));
+        }
+
+        /// <summary>
+        /// Identifies the Boost.Test test path of the provided Visual Studio test case
+        /// </summary>
+        /// <param name="testcase">Visual Studio test case (mapping to Boost.Test test case)</param>
+        /// <returns>The Boost.Test path of the test case which is identified by the Visual Studio counterpart</returns>
+        public static string GetBoostTestPath(this VSTestCase testcase)
+        {
+            return testcase.GetPropertyValue(TestPathProperty).ToString();
+        }
+
+        /// <summary>
+        /// Specifies the Boost.Test test path of the provided Visual Studio test case
+        /// </summary>
+        /// <param name="testcase">Visual Studio test case (mapping to Boost.Test test case)</param>
+        public static void SetBoostTestPath(this VSTestCase testcase, string value)
+        {
+            testcase.SetPropertyValue(TestPathProperty, value);
         }
     }
 }
