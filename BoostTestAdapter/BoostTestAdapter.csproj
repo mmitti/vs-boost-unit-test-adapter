@@ -150,6 +150,7 @@
     <Compile Include="TestBatch\TestBatchStrategy.cs" />
     <Compile Include="TestBatch\TestSuiteTestBatchStrategy.cs" />
     <Compile Include="TestBatch\OneShotTestBatchStrategy.cs" />
+    <Compile Include="Utility\ByteArrayUtils.cs" />
     <Compile Include="Utility\Code.cs" />
     <Compile Include="Utility\CommandEvaluator.cs" />
     <Compile Include="Utility\CommandLine.cs" />
