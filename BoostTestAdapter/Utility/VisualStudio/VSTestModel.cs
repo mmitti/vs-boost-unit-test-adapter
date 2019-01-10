@@ -41,19 +41,6 @@ namespace BoostTestAdapter.Utility.VisualStudio
         /// </summary>
         public static TestProperty TestPathProperty { get; } = TestProperty.Register("Boost.Test.Test.Path", "Boost.Test Test Path", typeof(string), typeof(VSTestModel));
 
-        private static readonly TestProperty _version = TestProperty.Register("Boost.Test.Boost.Version", "Boost Version", typeof(string), typeof(VSTestModel));
-
-        /// <summary>
-        /// Boost.Test Boost Version property
-        /// </summary>
-        public static TestProperty VersionProperty
-        {
-            get
-            {
-                return _version;
-            }
-        }
-
         /// <summary>
         /// Boost.Test Boost Version property
         /// </summary>

@@ -5,6 +5,8 @@
 
 using BoostTestAdapter.Utility;
 using BoostTestAdapter.Utility.ExecutionContext;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BoostTestAdapter.Boost.Runner
 {
@@ -47,9 +49,9 @@ namespace BoostTestAdapter.Boost.Runner
 
         public string Source => Runner.Source;
 
-        public int Execute(BoostTestRunnerCommandLineArgs args, BoostTestRunnerSettings settings, IProcessExecutionContext executionContext)
+        public async Task<int> ExecuteAsync(BoostTestRunnerCommandLineArgs args, BoostTestRunnerSettings settings, IProcessExecutionContext executionContext, CancellationToken token)
         {
-            return Runner.Execute(args, settings, executionContext);
+            return await Runner.ExecuteAsync(args, settings, executionContext, token);
         }
 
         #endregion

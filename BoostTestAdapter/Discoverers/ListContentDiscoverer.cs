@@ -202,7 +202,14 @@ namespace BoostTestAdapter.Discoverers
 
                 using (var context = new DefaultProcessExecutionContext())
                 {
-                    resultCode = runner.Execute(args, settings, context);
+                    var exec = runner.ExecuteAsync(args, settings, context, CancellationToken.None);
+
+                    if (!exec.Wait(settings.Timeout))
+                    {
+                        throw new Boost.Runner.TimeoutException(settings.Timeout);
+                    }
+
+                    resultCode = exec.Result;
                 }
 
                 if (resultCode != EXIT_SUCCESS)
