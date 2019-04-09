@@ -9,7 +9,8 @@ Refer to [http://www.boost.org/](http://www.boost.org/) for detailed information
 
 In order to use/develop the Boost Unit Test Adapter, the following components must be available:
 - [Microsoft Visual Studio](https://www.visualstudio.com/). The following versions are supported:
-  + Visual Studio 2017 (Community, Professional, Enterprise).
+  + Visual Studio 2017 (Community, Professional, Enterprise)
+  + Visual Studio 2019 (Community, Professional, Enterprise)
 
 ## More...
 
