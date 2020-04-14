@@ -23,6 +23,8 @@ using NUnit.Framework;
 
 using VSTestCase = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestCase;
 using BoostTestAdapter.Utility.ExecutionContext;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BoostTestAdapterNunit
 {
@@ -65,7 +67,7 @@ namespace BoostTestAdapterNunit
         }
 
         #endregion Helper Methods
-        
+
         /// <summary>
         /// List content discovery
         /// 
@@ -79,15 +81,15 @@ namespace BoostTestAdapterNunit
 
             string output = null;
 
-            A.CallTo(() => runner.ListContentSupported).Returns(true);
-            A.CallTo(() => runner.Execute(A<BoostTestRunnerCommandLineArgs>._, A<BoostTestRunnerSettings>._, A<IProcessExecutionContext>._)).Invokes((call) =>
+            A.CallTo(() => runner.Capabilities).Returns(new BoostTestRunnerCapabilities { ListContent = true, Version = false });
+            A.CallTo(() => runner.ExecuteAsync(A<BoostTestRunnerCommandLineArgs>._, A<BoostTestRunnerSettings>._, A<IProcessExecutionContext>._, A<CancellationToken>._)).Invokes((call) =>
             {
                 BoostTestRunnerCommandLineArgs args = (BoostTestRunnerCommandLineArgs) call.Arguments.First();
                 if ((args.ListContent.HasValue) && (args.ListContent.Value == ListContentFormat.DOT))
                 {
                     output = TestHelper.CopyEmbeddedResourceToDirectory("BoostTestAdapterNunit.Resources.ListContentDOT.sample.8.list.content.gv", args.StandardErrorFile);
                 }             
-            }).Returns(0);
+            }).Returns(Task.FromResult(0));
 
             FakeBoostTestRunnerFactory factory = new FakeBoostTestRunnerFactory(runner);
             ListContentDiscoverer discoverer = new ListContentDiscoverer(factory, DummyBoostTestPackageServiceFactory.Default);
@@ -101,7 +103,7 @@ namespace BoostTestAdapterNunit
             Assert.That(factory.ProvisionedRunners.Count, Is.EqualTo(1));
             foreach (IBoostTestRunner provisioned in factory.ProvisionedRunners.Select(provision => provision.Item3))
             {
-                A.CallTo(() => provisioned.Execute(A<BoostTestRunnerCommandLineArgs>._, A<BoostTestRunnerSettings>._, A<IProcessExecutionContext>._)).
+                A.CallTo(() => provisioned.ExecuteAsync(A<BoostTestRunnerCommandLineArgs>._, A<BoostTestRunnerSettings>._, A<IProcessExecutionContext>._, A<CancellationToken>._)).
                     WhenArgumentsMatch((arguments) =>
                     {
                         BoostTestRunnerCommandLineArgs args = (BoostTestRunnerCommandLineArgs) arguments.First();
@@ -136,9 +138,9 @@ namespace BoostTestAdapterNunit
         public void FailingExitCode()
         {
             IBoostTestRunner runner = A.Fake<IBoostTestRunner>();
-                        
-            A.CallTo(() => runner.ListContentSupported).Returns(true);
-            A.CallTo(() => runner.Execute(A<BoostTestRunnerCommandLineArgs>._, A<BoostTestRunnerSettings>._, A<IProcessExecutionContext>._)).Returns(-1073741515);
+    
+            A.CallTo(() => runner.Capabilities).Returns(new BoostTestRunnerCapabilities { ListContent = true, Version = false });
+            A.CallTo(() => runner.ExecuteAsync(A<BoostTestRunnerCommandLineArgs>._, A<BoostTestRunnerSettings>._, A<IProcessExecutionContext>._, A<CancellationToken>._)).Returns(Task.FromResult(-1073741515));
 
             FakeBoostTestRunnerFactory factory = new FakeBoostTestRunnerFactory(runner);
             ListContentDiscoverer discoverer = new ListContentDiscoverer(factory, DummyBoostTestPackageServiceFactory.Default);
@@ -150,6 +152,93 @@ namespace BoostTestAdapterNunit
             
             // Ensure proper test discovery
             Assert.That(sink.Tests.Count, Is.EqualTo(0));
+        }
+
+        /// <summary>
+        /// Assert that: Given a Boost.Test module which supports --version, all discovered tests are annotated accordingly
+        /// </summary>
+        [Test]
+        public void VersionAnnotation()
+        {
+            IBoostTestRunner runner = A.Fake<IBoostTestRunner>();
+
+            A.CallTo(() => runner.Capabilities).Returns(new BoostTestRunnerCapabilities { ListContent = true, Version = true });
+            A.CallTo(() => runner.Execute(A<BoostTestRunnerCommandLineArgs>._, A<BoostTestRunnerSettings>._, A<IProcessExecutionContext>._)).Invokes((call) =>
+            {
+                BoostTestRunnerCommandLineArgs args = (BoostTestRunnerCommandLineArgs) call.Arguments.First();
+
+                // --list_content=DOT
+                if ((args.ListContent.HasValue) && (args.ListContent.Value == ListContentFormat.DOT) && (!string.IsNullOrEmpty(args.StandardErrorFile)))
+                {
+                    TestHelper.CopyEmbeddedResourceToDirectory("BoostTestAdapterNunit.Resources.ListContentDOT.sample.3.list.content.gv", args.StandardErrorFile);
+                }
+                // --version
+                else if ((args.Version) && (!string.IsNullOrEmpty(args.StandardErrorFile)))
+                {
+                    TestHelper.CopyEmbeddedResourceToDirectory("BoostTestAdapterNunit.Resources.Version.sample.version.stderr.log", args.StandardErrorFile);
+                }
+            }).Returns(0);
+
+            FakeBoostTestRunnerFactory factory = new FakeBoostTestRunnerFactory(runner);
+            ListContentDiscoverer discoverer = new ListContentDiscoverer(factory, DummyBoostTestPackageServiceFactory.Default);
+
+            DefaultTestContext context = new DefaultTestContext();
+            DefaultTestCaseDiscoverySink sink = new DefaultTestCaseDiscoverySink();
+
+            discoverer.DiscoverTests(new[] { "test.exe", }, context, sink);
+
+            // Ensure proper test discovery
+            Assert.That(sink.Tests.Count, Is.Not.EqualTo(0));
+
+            // Ensure that version property is available
+            foreach (var test in sink.Tests)
+            {
+                var version = test.GetPropertyValue(VSTestModel.VersionProperty);
+                Assert.That(version, Is.EqualTo("1.63.0"));
+            }
+        }
+
+        /// <summary>
+        /// Assert that: Given a Boost.Test module which does not support --version, all discovered tests do not advertise the Boost version
+        /// </summary>
+        [Test]
+        public void NoVersionCapabilities()
+        {
+            IBoostTestRunner runner = A.Fake<IBoostTestRunner>();
+
+            A.CallTo(() => runner.Capabilities).Returns(new BoostTestRunnerCapabilities { ListContent = true, Version = false });
+            A.CallTo(() => runner.Execute(A<BoostTestRunnerCommandLineArgs>._, A<BoostTestRunnerSettings>._, A<IProcessExecutionContext>._)).Invokes((call) =>
+            {
+                BoostTestRunnerCommandLineArgs args = (BoostTestRunnerCommandLineArgs)call.Arguments.First();
+
+                // --list_content=DOT
+                if ((args.ListContent.HasValue) && (args.ListContent.Value == ListContentFormat.DOT) && (!string.IsNullOrEmpty(args.StandardErrorFile)))
+                {
+                    TestHelper.CopyEmbeddedResourceToDirectory("BoostTestAdapterNunit.Resources.ListContentDOT.sample.3.list.content.gv", args.StandardErrorFile);
+                }
+                // --version
+                else if ((args.Version) && (!string.IsNullOrEmpty(args.StandardErrorFile)))
+                {
+                    TestHelper.CopyEmbeddedResourceToDirectory("BoostTestAdapterNunit.Resources.Version.missing.version.stderr.log", args.StandardErrorFile);
+                }
+            }).Returns(0);
+
+            FakeBoostTestRunnerFactory factory = new FakeBoostTestRunnerFactory(runner);
+            ListContentDiscoverer discoverer = new ListContentDiscoverer(factory, DummyBoostTestPackageServiceFactory.Default);
+
+            DefaultTestContext context = new DefaultTestContext();
+            DefaultTestCaseDiscoverySink sink = new DefaultTestCaseDiscoverySink();
+
+            discoverer.DiscoverTests(new[] { "test.exe", }, context, sink);
+
+            // Ensure proper test discovery
+            Assert.That(sink.Tests.Count, Is.Not.EqualTo(0));
+
+            // Ensure that version property is not available
+            foreach (var test in sink.Tests)
+            {
+                Assert.That(test.GetPropertyValue(VSTestModel.VersionProperty), Is.Null);
+            }
         }
     }
 }

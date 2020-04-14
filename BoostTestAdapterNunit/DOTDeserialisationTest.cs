@@ -56,13 +56,25 @@ namespace BoostTestAdapterNunit
         /// <param name="encoding">The encoding by which to interpret the resource file</param>
         private void Compare(string resource, TestFramework expected, Encoding encoding)
         {
-            using (var stream = TestHelper.LoadEmbeddedResource(resource))
-            using (var reader = new StreamReader(stream, encoding))
+            Stream stream = null;
+            try
             {
-                TestFrameworkDOTDeserialiser parser = new TestFrameworkDOTDeserialiser(Source);
-                TestFramework framework = parser.Deserialise(reader);
+                using (var reader = new StreamReader(TestHelper.LoadEmbeddedResource(resource), encoding))
+                {
+                    stream = null;
 
-                FrameworkEqualityVisitor.IsEqualTo(framework, expected, false);
+                    TestFrameworkDOTDeserialiser parser = new TestFrameworkDOTDeserialiser(Source);
+                    TestFramework framework = parser.Deserialise(reader);
+
+                    FrameworkEqualityVisitor.IsEqualTo(framework, expected, false);
+                }
+            }
+            finally
+            {
+                if (stream != null)
+                {
+                    stream.Dispose();
+                }
             }
         }
 

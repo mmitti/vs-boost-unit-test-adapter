@@ -62,9 +62,9 @@ namespace BoostTestAdapterNunit
             Assert.That(settings.LogLevel, Is.EqualTo(LogLevel.TestSuite));
             Assert.That(settings.ExternalTestRunner, Is.Null);
             Assert.That(settings.DetectFloatingPointExceptions, Is.False);
-            Assert.That(settings.CatchSystemErrors, Is.True);
+            Assert.That(settings.CatchSystemErrors, Is.Null);
             Assert.That(settings.TestBatchStrategy, Is.EqualTo(Strategy.TestCase));
-            Assert.That(settings.ForceListContent, Is.False);
+            Assert.That(settings.ForceBoostVersion, Is.Empty);
             Assert.That(settings.WorkingDirectory, Is.Null);
             Assert.That(settings.EnableStdOutRedirection, Is.True);
             Assert.That(settings.EnableStdErrRedirection, Is.True);
@@ -171,7 +171,9 @@ namespace BoostTestAdapterNunit
         ///     - Assert that: the Boost 1.62 workaround option can be parsed
         /// </summary>
         [TestCase("<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings><BoostTest><UseBoost162Workaround>true</UseBoost162Workaround></BoostTest></RunSettings>", Result = true)]
+        [TestCase("<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings><BoostTest><UseBoost162Workaround>1</UseBoost162Workaround></BoostTest></RunSettings>", Result = true)]
         [TestCase("<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings><BoostTest><UseBoost162Workaround>false</UseBoost162Workaround></BoostTest></RunSettings>", Result = false)]
+        [TestCase("<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings><BoostTest><UseBoost162Workaround>0</UseBoost162Workaround></BoostTest></RunSettings>", Result = false)]
         [TestCase("<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings><BoostTest /></RunSettings>", Result = false)]
         public bool ParseWorkaroundOption(string settingsXml)
         {
@@ -193,6 +195,51 @@ namespace BoostTestAdapterNunit
         {
             BoostTestAdapterSettings settings = ParseXml(settingsXml);
             return settings.PostTestDelay;
+        }
+
+        /// <summary>
+        /// The 'CatchSystemErrors' option can be properly parsed
+        /// 
+        /// Test aims:
+        ///     - Assert that: the 'CatchSystemErrors' option can be properly parsed
+        /// </summary>
+        [TestCase("<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings><BoostTest><CatchSystemErrors>true</CatchSystemErrors></BoostTest></RunSettings>", Result = true)]
+        [TestCase("<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings><BoostTest><CatchSystemErrors>1</CatchSystemErrors></BoostTest></RunSettings>", Result = true)]
+        [TestCase("<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings><BoostTest><CatchSystemErrors>false</CatchSystemErrors></BoostTest></RunSettings>", Result = false)]
+        [TestCase("<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings><BoostTest><CatchSystemErrors>0</CatchSystemErrors></BoostTest></RunSettings>", Result = false)]
+        [TestCase("<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings><BoostTest /></RunSettings>", Result = null)]
+        public bool? ParseCatchSystemErrorsOption(string settingsXml)
+        {
+            BoostTestAdapterSettings settings = ParseXml(settingsXml);
+            return settings.CatchSystemErrors;
+        }
+        
+        /// <summary>
+        /// The 'TestBatchStrategy' option can be properly parsed
+        /// 
+        /// Test aims:
+        ///     - Assert that: The 'TestBatchStrategy' option can be properly parsed 
+        /// </summary>
+        [TestCase("<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings><BoostTest><TestBatchStrategy>TestCase</TestBatchStrategy></BoostTest></RunSettings>", Result = Strategy.TestCase)]
+        [TestCase("<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings><BoostTest><TestBatchStrategy>TestSuite</TestBatchStrategy></BoostTest></RunSettings>", Result = Strategy.TestSuite)]
+        [TestCase("<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings><BoostTest><TestBatchStrategy>Source</TestBatchStrategy></BoostTest></RunSettings>", Result = Strategy.Source)]
+        [TestCase("<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings><BoostTest><TestBatchStrategy>One</TestBatchStrategy></BoostTest></RunSettings>", Result = Strategy.One)]
+        public Strategy ParseTestBatchStrategy(string settingsXml)
+        {
+            BoostTestAdapterSettings settings = ParseXml(settingsXml);
+            return settings.TestBatchStrategy;
+        }
+
+        /// <summary>
+        /// Assert that: The 'ForceBoostVersion' option can be properly parsed
+        /// </summary>
+        [TestCase("<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings><BoostTest><ForceBoostVersion>1.59</ForceBoostVersion></BoostTest></RunSettings>", Result = "1.59")]
+        [TestCase("<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings><BoostTest><ForceBoostVersion>1.62</ForceBoostVersion></BoostTest></RunSettings>", Result = "1.62")]
+        [TestCase("<?xml version=\"1.0\" encoding=\"utf-8\"?><RunSettings><BoostTest><ForceBoostVersion>1.63</ForceBoostVersion></BoostTest></RunSettings>", Result = "1.63")]
+        public string ParseForceBoostVersion(string settingsXml)
+        {
+            BoostTestAdapterSettings settings = ParseXml(settingsXml);
+            return settings.ForceBoostVersion;
         }
 
         #endregion Tests

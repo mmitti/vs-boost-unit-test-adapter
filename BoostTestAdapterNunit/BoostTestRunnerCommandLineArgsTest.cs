@@ -5,7 +5,7 @@
 
 using BoostTestAdapter.Boost.Runner;
 using NUnit.Framework;
-using System.IO;
+using System.Collections.Generic;
 
 namespace BoostTestAdapterNunit
 {
@@ -45,7 +45,7 @@ namespace BoostTestAdapterNunit
 
             args.DetectMemoryLeaks = 0;
 
-            args.CatchSystemErrors = false;
+            args.CatchSystemErrors = true;
             args.DetectFPExceptions = true;
 
             args.StandardOutFile = GenerateFullyQualifiedPath("stdout.log");
@@ -72,6 +72,25 @@ namespace BoostTestAdapterNunit
         }
 
         /// <summary>
+        /// "BUTA" environment variable present by default in the environment variable collection
+        /// 
+        /// Test aims:
+        ///     - Ensure that the "BUTA" environment is present by default in the enviorment variable collection.
+        /// </summary>
+        [Test]
+        public void BUTAEnviormentVariablePresent()
+        {
+            BoostTestRunnerCommandLineArgs args = new BoostTestRunnerCommandLineArgs();
+
+            var oExpectedEnviormentVariables = new Dictionary<string, string>()
+            {
+                { "BUTA", "1" }
+            };
+
+            CollectionAssert.AreEqual(oExpectedEnviormentVariables, args.Environment);
+        }
+
+        /// <summary>
         /// Non-default configuration of a command-line arguments structure.
         /// 
         /// Test aims:
@@ -82,7 +101,7 @@ namespace BoostTestAdapterNunit
         {
             BoostTestRunnerCommandLineArgs args = GenerateCommandLineArgs();
             // serge: boost 1.60 requires uppercase input
-            Assert.That(args.ToString(), Is.EqualTo("\"--run_test=test,suite/*\" \"--catch_system_errors=no\" \"--log_format=XML\" \"--log_level=test_suite\" \"--log_sink="
+            Assert.That(args.ToString(), Is.EqualTo("\"--run_test=test,suite/*\" \"--catch_system_errors=yes\" \"--log_format=XML\" \"--log_level=test_suite\" \"--log_sink="
                 + GenerateFullyQualifiedPath("log.xml") + "\" \"--report_format=XML\" \"--report_level=detailed\" \"--report_sink="
                 + GenerateFullyQualifiedPath("report.xml") + "\" \"--detect_memory_leak=0\" \"--detect_fp_exceptions=yes\" > \"" 
                 + GenerateFullyQualifiedPath("stdout.log") + "\" 2> \""
@@ -142,8 +161,11 @@ namespace BoostTestAdapterNunit
             Assert.That(args.DetectFPExceptions, Is.EqualTo(clone.DetectFPExceptions));
             Assert.That(args.SavePattern, Is.EqualTo(clone.SavePattern));
             Assert.That(args.ListContent, Is.EqualTo(clone.ListContent));
+            Assert.That(args.Help, Is.EqualTo(clone.Help));
+            Assert.That(args.Version, Is.EqualTo(clone.Version));
 
             Assert.That(args.ToString(), Is.EqualTo(clone.ToString()));
+            Assert.That(args.Environment, Is.EqualTo(clone.Environment));
         }
 
         /// <summary>
@@ -194,6 +216,33 @@ namespace BoostTestAdapterNunit
             
             // list content only includes the --list_content and the output redirection commands
             Assert.That(args.ToString(), Is.EqualTo(expected));
+        }
+
+        /// <summary>
+        /// Assert that: A Boost.Test command-line requiring version output is generated accordingly
+        /// </summary>
+        [Test]
+        public void VersionCommandLineArgs()
+        {
+            BoostTestRunnerCommandLineArgs args = new BoostTestRunnerCommandLineArgs()
+            {
+                Version = true
+            };
+
+            // Version without output redirection
+            {
+                const string expected = "\"--version\"";
+                Assert.That(args.ToString(), Is.EqualTo(expected));
+            }
+
+            // Version with output redirection
+            {
+                args.StandardOutFile = @"C:\Temp\version.out";
+                args.StandardErrorFile = @"C:\Temp\version.err";
+
+                const string expected = "\"--version\" > \"C:\\Temp\\version.out\" 2> \"C:\\Temp\\version.err\"";
+                Assert.That(args.ToString(), Is.EqualTo(expected));
+            }
         }
 
         #endregion Tests

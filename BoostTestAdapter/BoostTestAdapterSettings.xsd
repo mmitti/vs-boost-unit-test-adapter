@@ -38,6 +38,7 @@
           </xsd:restriction>
         </xsd:simpleType>
       </xsd:element>
+      <xsd:element name="ForceBoostVersion" minOccurs="0" type="VersionType" />
     </xsd:all>
   </xsd:complexType>
 
@@ -61,6 +62,7 @@
       <xsd:enumeration value="Source" />
       <xsd:enumeration value="TestSuite" />
       <xsd:enumeration value="TestCase" />
+      <xsd:enumeration value="One" />
     </xsd:restriction>
   </xsd:simpleType>
 
@@ -91,4 +93,10 @@
     </xsd:sequence>
   </xsd:complexType>
 
+  <xsd:simpleType name="VersionType" final="restriction">
+    <xsd:restriction base="xsd:string">
+      <xsd:pattern value="\d+(\.\d+(.\d+)?)?"/>
+    </xsd:restriction>
+  </xsd:simpleType>
+    
 </xsd:schema>

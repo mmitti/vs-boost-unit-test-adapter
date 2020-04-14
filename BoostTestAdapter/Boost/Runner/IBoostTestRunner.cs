@@ -4,6 +4,8 @@
 // http://www.boost.org/LICENSE_1_0.txt)
 
 using BoostTestAdapter.Utility.ExecutionContext;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BoostTestAdapter.Boost.Runner
 {
@@ -18,18 +20,18 @@ namespace BoostTestAdapter.Boost.Runner
         /// <param name="args">The Boost Test framework command line options.</param>
         /// <param name="settings">The Boost Test runner settings.</param>
         /// <param name="executionContext">An IProcessExecutionContext which will manage any spawned process.</param>
+        /// <param name="token">A cancellation token to suspend test execution.</param>
         /// <returns>Boost.Test result code</returns>
-        /// <exception cref="TimeoutException">Thrown in case specified timeout threshold is exceeded.</exception>
-        int Execute(BoostTestRunnerCommandLineArgs args, BoostTestRunnerSettings settings, IProcessExecutionContext executionContext);
-        
+        Task<int> ExecuteAsync(BoostTestRunnerCommandLineArgs args, BoostTestRunnerSettings settings, IProcessExecutionContext executionContext, CancellationToken token);
+
         /// <summary>
         /// Provides a source Id distinguishing different instances
         /// </summary>
         string Source { get; }
 
         /// <summary>
-        /// Determines if the test runner provides --list_content capabilities.
+        /// Determines the test runner's capability set
         /// </summary>
-        bool ListContentSupported { get; }
+        IBoostTestRunnerCapabilities Capabilities { get; }
     }
 }

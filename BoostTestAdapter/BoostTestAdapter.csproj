@@ -10,7 +10,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BoostTestAdapter</RootNamespace>
-    <AssemblyName>BoostTestAdapter</AssemblyName>
+    <AssemblyName>BoostTestAdapter.TestAdapter</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -60,8 +60,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <FilesToLocalize Include="$(OutDir)\BoostTestAdapter.dll">
-      <TranslationFile>$(MSBuildThisFileDirectory)..\loc\lcl\{Lang}\BoostTestAdapter.dll.lcl</TranslationFile>
+    <FilesToLocalize Include="$(OutDir)\BoostTestAdapter.TestAdapter.dll">
+      <TranslationFile>$(MSBuildThisFileDirectory)..\loc\lcl\{Lang}\BoostTestAdapter.TestAdapter.dll.lcl</TranslationFile>
     </FilesToLocalize>
     <FilesToSign Include="$(OutDir)\$(AssemblyName).dll" Condition="'$(RealSign)' == 'True'">
       <Authenticode>Microsoft</Authenticode>
@@ -75,6 +75,10 @@
   <ItemGroup>
     <Compile Include="BoostTestDiscoverer.cs" />
     <Compile Include="Boost\Runner\BoostTest162Runner.cs" />
+    <Compile Include="Boost\Runner\BoostTestRunnerCapabilities.cs" />
+    <Compile Include="Boost\Runner\BoostTestRunnerCapabilityOverride.cs" />
+    <Compile Include="Boost\Runner\CachingBoostTestRunnerFactory.cs" />
+    <Compile Include="Boost\Runner\IBoostTestRunnerCapabilities.cs" />
     <Compile Include="Discoverers\BoostTestDiscovererUtility.cs" />
     <Compile Include="Discoverers\BoostTestDiscovererFactory.cs" />
     <Compile Include="BoostTestExecutor.cs" />
@@ -145,6 +149,8 @@
     <Compile Include="TestBatch\SourceTestBatchStrategy.cs" />
     <Compile Include="TestBatch\TestBatchStrategy.cs" />
     <Compile Include="TestBatch\TestSuiteTestBatchStrategy.cs" />
+    <Compile Include="TestBatch\OneShotTestBatchStrategy.cs" />
+    <Compile Include="Utility\ByteArrayUtils.cs" />
     <Compile Include="Utility\Code.cs" />
     <Compile Include="Utility\CommandEvaluator.cs" />
     <Compile Include="Utility\CommandLine.cs" />
@@ -160,6 +166,7 @@
     <Compile Include="Utility\TemporaryFile.cs" />
     <Compile Include="Utility\TestPathGenerator.cs" />
     <Compile Include="Utility\TestRun.cs" />
+    <Compile Include="Utility\TimedScope.cs" />
     <Compile Include="Utility\VisualStudio\DefaultTestCaseDiscoverySink.cs" />
     <Compile Include="Utility\VisualStudio\VSTestModel.cs" />
     <Compile Include="Utility\XmlReaderHelper.cs" />
@@ -206,13 +213,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>REM required for the BoostTestPlugin so that the log4net config file is included as part of the vsix installation
-mkdir $(OutDir)\..\BoostTestPlugin
-xcopy /c /i /y $(TargetFileName).config $(OutDir)\..\BoostTestPlugin
-REM required by some unit tests in LoggerTest.cs so as to have a certain degree of confidence that log4net is actually logging to file
-mkdir $(OutDir)\..\BoostTestAdapterNunit
-xcopy /c /i /y $(TargetFileName).config $(OutDir)\..\BoostTestAdapterNunit
-</PostBuildEvent>
+    <PostBuildEvent></PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

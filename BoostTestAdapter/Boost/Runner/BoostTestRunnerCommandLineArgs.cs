@@ -174,6 +174,8 @@ namespace BoostTestAdapter.Boost.Runner
         internal const string ListContentArg = "--list_content";
         internal const string HelpArg = "--help";
 
+        internal const string VersionArg = "--version";
+
         private const string TestSeparator = ",";
 
         private const char ArgSeparator = ' ';
@@ -220,7 +222,7 @@ namespace BoostTestAdapter.Boost.Runner
             this.ShowProgress = false;
             this.BuildInfo = false;
             this.AutoStartDebug = "no";
-            this.CatchSystemErrors = true;
+            this.CatchSystemErrors = null;
             this.ColorOutput = false;
             this.ResultCode = true;
             this.Random = 0;
@@ -229,8 +231,19 @@ namespace BoostTestAdapter.Boost.Runner
             this.SavePattern = false;
             this.ListContent = null;
             this.Help = false;
+            this.Version = false;
 
-            this.Environment = new Dictionary<string, string>();
+            /* The environment variable "BUTA" is set whenever a test is executed. The purpose
+             * is to provide a means for boost unit tests to detect that they are being executed
+             * using the boost unit test adapter. One might use this so as for the tests to 
+             * increase the verbosity level whenever boost unit tests are executed using the
+             * boost unit test adapter.
+             */
+
+            this.Environment = new Dictionary<string, string>()
+            {
+                { "BUTA", "1" }
+            };
         }
 
         #endregion Constructors
@@ -248,6 +261,8 @@ namespace BoostTestAdapter.Boost.Runner
         /// <summary>
         /// List of fully qualified name tests which are to be executed.
         /// </summary>
+        /// <remarks>The semantics of this property follow the documentation of Boost.Test's --run_test argument for Boost 1.61</remarks>
+        /// <remarks>This property cannot handle multiple filter definitions as described in documentation of Boost.Test's --run_test argument for Boost 1.63</remarks>
         public IList<string> Tests { get; private set; }
 
         /// <summary>
@@ -351,14 +366,20 @@ namespace BoostTestAdapter.Boost.Runner
         public string AutoStartDebug { get; set; }
 
         /// <summary>
-        /// Flag which displays Boost UTF test information in standard out.
+        /// Flag which displays Boost.Test test information in standard out.
         /// </summary>
         public bool BuildInfo { get; set; }
 
         /// <summary>
         /// Determines whether system errors should be caught.
         /// </summary>
-        public bool CatchSystemErrors { get; set; }
+        /// <remarks>
+        /// Since the default value of '--catch_system_errors' is dependent on Boost.Test's 
+        /// '#define BOOST_TEST_DEFAULTS_TO_CORE_DUMP', this value has been set to a optional type
+        /// 
+        /// Reference: http://www.boost.org/doc/libs/1_60_0/libs/test/doc/html/boost_test/utf_reference/rt_param_reference/catch_system.html
+        /// </remarks>
+        public bool? CatchSystemErrors { get; set; }
 
         /// <summary>
         /// States whether standard output text is colour coded.
@@ -367,7 +388,7 @@ namespace BoostTestAdapter.Boost.Runner
         public bool ColorOutput { get; set; }
 
         /// <summary>
-        /// Determines the result code the Boost UTF uses on exit.
+        /// Determines the result code the Boost.Test uses on exit.
         /// </summary>
         public bool ResultCode { get; set; }
 
@@ -382,7 +403,7 @@ namespace BoostTestAdapter.Boost.Runner
         public bool UseAltStack { get; set; }
 
         /// <summary>
-        /// Instructs the Boost UTF to break on floating-point exceptions.
+        /// Instructs the Boost.Test to break on floating-point exceptions.
         /// </summary>
         public bool DetectFPExceptions { get; set; }
 
@@ -393,7 +414,7 @@ namespace BoostTestAdapter.Boost.Runner
         public bool SavePattern { get; set; }
 
         /// <summary>
-        /// The Boost UTF lists all tests which are to be executed without actually executing the tests.
+        /// The Boost.Test lists all tests which are to be executed without actually executing the tests.
         /// </summary>
         /// <remarks>Introduced in Boost 1.59 / Boost Test 3</remarks>
         public ListContentFormat? ListContent { get; set; }
@@ -402,6 +423,11 @@ namespace BoostTestAdapter.Boost.Runner
         /// Help output.
         /// </summary>
         public bool Help { get; set; }
+
+        /// <summary>
+        /// Version information output.
+        /// </summary>
+        public bool Version { get; set; }
 
         /// <summary>
         /// Path (relative to the WorkingDirectory) to the report file which will host the standard output content.
@@ -448,7 +474,16 @@ namespace BoostTestAdapter.Boost.Runner
             {
                 AddArgument(HelpArg, args);
 
-                // return immediately since Boost UTF should ignore the rest of the arguments
+                // return immediately since Boost.Test should ignore the rest of the arguments
+                return AppendRedirection(args).ToString().TrimEnd();
+            }
+
+            // --version
+            if (this.Version)
+            {
+                AddArgument(VersionArg, args);
+
+                // return immediately since Boost.Test should ignore the rest of the arguments
                 return AppendRedirection(args).ToString().TrimEnd(null);
             }
 
@@ -457,7 +492,7 @@ namespace BoostTestAdapter.Boost.Runner
             {
                 AddArgument(ListContentArg, ListContentFormatToString(this.ListContent.Value), args);
 
-                // return immediately since Boost UTF should ignore the rest of the arguments
+                // return immediately since Boost.Test should ignore the rest of the arguments
                 return AppendRedirection(args).ToString().TrimEnd(null);
             }
 
@@ -485,10 +520,10 @@ namespace BoostTestAdapter.Boost.Runner
                 AddArgument(AutoStartDebugArg, this.AutoStartDebug, args);
             }
 
-            // --catch_system_errors=no
-            if (!this.CatchSystemErrors)
+            // --catch_system_errors=yes
+            if (this.CatchSystemErrors.HasValue)
             {
-                AddArgument(CatchSystemErrorsArg, No, args);
+                AddArgument(CatchSystemErrorsArg, (this.CatchSystemErrors.Value ? Yes : No), args);
             }
 
             // --color_output=yes
@@ -809,6 +844,8 @@ namespace BoostTestAdapter.Boost.Runner
             clone.DetectFPExceptions = this.DetectFPExceptions;
             clone.SavePattern = this.SavePattern;
             clone.ListContent = this.ListContent;
+            clone.Help = this.Help;
+            clone.Version = this.Version;
 
             return clone;
         }

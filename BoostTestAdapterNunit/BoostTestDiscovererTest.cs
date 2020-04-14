@@ -18,6 +18,10 @@ using NUnit.Framework;
 using BoostTestAdapter.Boost.Runner;
 using FakeItEasy;
 using BoostTestAdapter.Utility.ExecutionContext;
+using System;
+using System.Threading.Tasks;
+using System.Threading;
+
 
 namespace BoostTestAdapterNunit
 {
@@ -184,20 +188,14 @@ namespace BoostTestAdapterNunit
             this.Source = source;
         }
 
-        public bool ListContentSupported
-        {
-            get
-            {
-                return true;
-            }
-        }
-
+        public IBoostTestRunnerCapabilities Capabilities { get; } = new BoostTestRunnerCapabilities { ListContent = true, Version = false };
+        
         public string Source { get; private set; }
 
-        public int Execute(BoostTestRunnerCommandLineArgs args, BoostTestRunnerSettings settings, IProcessExecutionContext context)
+        public Task<int> ExecuteAsync(BoostTestRunnerCommandLineArgs args, BoostTestRunnerSettings settings, IProcessExecutionContext context, CancellationToken token)
         {
             Copy("BoostTestAdapterNunit.Resources.ListContentDOT.sample.8.list.content.gv", args.StandardErrorFile);
-            return 0;
+            return Task.FromResult(0);
         }
 
         private void Copy(string embeddedResource, string path)
