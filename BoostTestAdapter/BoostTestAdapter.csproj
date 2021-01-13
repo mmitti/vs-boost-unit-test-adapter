@@ -193,7 +193,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudioEng.MicroBuild.Core">
-      <Version>0.2.0</Version>
+      <Version>0.4.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.TestPlatform.ObjectModel">
       <Version>15.0.1</Version>
