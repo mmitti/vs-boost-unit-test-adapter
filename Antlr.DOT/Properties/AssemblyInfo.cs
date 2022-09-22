@@ -1,4 +1,4 @@
-﻿// This file has been modified by Microsoft on 8/2017.
+// This file has been modified by Microsoft on 8/2017.
 
 using System.Reflection;
 using System.Runtime.CompilerServices;
