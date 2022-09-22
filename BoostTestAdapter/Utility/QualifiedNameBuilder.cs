@@ -171,6 +171,8 @@ namespace BoostTestAdapter.Utility
         public string ToString(string separator)
         {
             // Skip the Master Test Suite. Master Test Suite is omitted in qualified name.
+            if (separator == ".") 
+                return string.Join(separator, this.Path.Skip(1).Select(x=>x.Replace(".", "_")));
             return string.Join(separator, this.Path.Skip(1));
         }
 

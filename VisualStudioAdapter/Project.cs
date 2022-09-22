@@ -77,7 +77,7 @@ namespace VisualStudioAdapter
         {
             get
             {
-                return this._project.ConfigurationManager.ActiveConfiguration.ConfigurationName + "|" + this._project.ConfigurationManager.ActiveConfiguration.PlatformName;
+                return this._project?.ConfigurationManager?.ActiveConfiguration?.ConfigurationName ?? "Unknown"+ "|" + this._project?.ConfigurationManager?.ActiveConfiguration?.PlatformName ?? "Unknown";
             }
         }
 

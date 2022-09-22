@@ -113,6 +113,7 @@ namespace VisualStudioAdapter
 
             var project = new Project(dteProject);
             var configuration = project.ActiveConfiguration;
+            if (configuration == null) return null;
             if (!string.Equals(binary, configuration.PrimaryOutput, StringComparison.Ordinal))
             {
                 return null;
