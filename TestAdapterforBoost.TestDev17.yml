@@ -34,6 +34,10 @@ resources:
     type: git
     name: VCLS-Extensions
     ref: refs/heads/dev17
+parameters:
+- name: SignType
+  type: string
+  default: 'real'
 variables:
 - name: ApiScanClientId
   value: d318cba7-db4d-4fb3-99e1-01879cb74e91
@@ -72,8 +76,6 @@ variables:
   value: "$(RealSign)"
 - name: RetainBuild
   value: "$(TAfBTRetainBuild)"
-- name: SignType
-  value: "$(TAfBTSignType)"
 - name: TeamName
   value: VCLS
 - name: VersionNumber
@@ -119,11 +121,10 @@ extends:
             targetPath: $(Build.ArtifactStagingDirectory)\drop
             artifactName: drop
           mb:
-            signing:
-              enabled: true
-              signType: $(SignType)
-              ${{ if eq(variables['SignType'], 'real') }}:
-                signWithProd: true      
+            enabled: true
+            signType: '${{ parameters.SignType }}'
+            ${{ if eq(parameters.SignType, 'real') }}:
+              signWithProd: true     
             localization:
               enabled: true
         steps:
