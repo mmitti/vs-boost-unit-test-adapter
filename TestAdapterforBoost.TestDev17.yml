@@ -121,10 +121,11 @@ extends:
             targetPath: $(Build.ArtifactStagingDirectory)\drop
             artifactName: drop
           mb:
-            enabled: true
-            signType: '${{ parameters.SignType }}'
-            ${{ if eq(parameters.SignType, 'real') }}:
-              signWithProd: true     
+            signing:
+              enabled: true
+              signType: '${{ parameters.SignType }}'
+              ${{ if eq(parameters.SignType, 'real') }}:
+                signWithProd: true     
             localization:
               enabled: true
         steps:
