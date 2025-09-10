@@ -221,6 +221,8 @@ jobs:
       toolVersion: 'Latest'
       verbosityLevel: silent
       continueOnError: true
+    env:
+      SYSTEM_ACCESSTOKEN: $(System.AccessToken)
   # Have to use manual CodeQL Init task for now because the 1ES template auto injected CodeQL contains bug that hangs during pipeline builds.
   - task: MS-CST-E.codeql-3000-release.finalize-task.CodeQL3000Finalize@0
     displayName: CodeQL 3000 Finalize
