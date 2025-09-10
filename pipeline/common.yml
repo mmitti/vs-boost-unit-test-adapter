@@ -2,47 +2,45 @@ parameters:
 - name: IsProd
   type: boolean
   default: false
-variables:
-- name: ApiScanClientId
-  value: d318cba7-db4d-4fb3-99e1-01879cb74e91
-- name: ArchiveSymbols
-  value: "$(TAfBTArchiveSymbols)"
-- name: BuildConfiguration
-  value: "$(TAfBTBuildConfiguration)"
-- name: BuildPlatform
-  value: Any CPU
-- name: CodeQL.Enabled
-  value: True
-- name: Codeql.Language
-  value: csharp,cpp
-- name: CodeQL.TSAEnabled
-  value: True
-- name: Codeql.TSAOptionsPath
-  value: $(Build.SourcesDirectory)\vs-boost-unit-test-adapter\TSAOptions.json
-- name: DropRoot
-  value: '\\cpvsbuild\drops'
-- name: Packaging.EnableSBOMSigning
-  value: "$(TAfBTEnableSBOMSigning)"
-- name: ProductComponent
-  value: "$(TAfBTProductComponent)"
-- name: Publish
-  value: "$(TAfBTPublish)"
-# Quick build is used to skip some compliance tasks to quickly generate a .vsix for testing.
-- name: RunAdditionalComplianceChecks
-  value: "$(TAfBTRunAdditionalComplianceChecks)"
-- name: TAfBTRealSign
-  value: "$(RealSign)"
-- name: RetainBuild
-  value: "$(TAfBTRetainBuild)"
-- name: TeamName
-  value: VCLS
-- name: VersionNumber
-  value: "$(TAfBTVersionNumber)"
 jobs:
 - job: Phase_1
   displayName: Phase 1
   timeoutInMinutes: 0
   cancelTimeoutInMinutes: 1
+  variables:
+  - name: ArchiveSymbols
+    value: "$(TAfBTArchiveSymbols)"
+  - name: BuildConfiguration
+    value: "$(TAfBTBuildConfiguration)"
+  - name: BuildPlatform
+    value: Any CPU
+  - name: CodeQL.Enabled
+    value: True
+  - name: Codeql.Language
+    value: csharp,cpp
+  - name: CodeQL.TSAEnabled
+    value: True
+  - name: Codeql.TSAOptionsPath
+    value: $(Build.SourcesDirectory)\vs-boost-unit-test-adapter\TSAOptions.json
+  - name: DropRoot
+    value: '\\cpvsbuild\drops'
+  - name: Packaging.EnableSBOMSigning
+    value: "$(TAfBTEnableSBOMSigning)"
+  - name: ProductComponent
+    value: "$(TAfBTProductComponent)"
+  - name: Publish
+    value: "$(TAfBTPublish)"
+  # Quick build is used to skip some compliance tasks to quickly generate a .vsix for testing.
+  - name: RunAdditionalComplianceChecks
+    value: "$(TAfBTRunAdditionalComplianceChecks)"
+  - name: TAfBTRealSign
+    value: "$(RealSign)"
+  - name: RetainBuild
+    value: "$(TAfBTRetainBuild)"
+  - name: TeamName
+    value: VCLS
+  - name: VersionNumber
+    value: "$(TAfBTVersionNumber)"
   templateContext:
     outputs:
     - output: pipelineArtifact
@@ -215,6 +213,7 @@ jobs:
     displayName: 'Run APIScan'
     condition: eq (variables.RunAdditionalComplianceChecks, True)
     inputs:
+      azureSubscription: 'VSEng-APIScanSC'
       softwareFolder: '$(Build.ArtifactStagingDirectory)\drop\FilesToScanDrop'
       softwareName: BoostTest
       softwareVersionNum: 1.0
@@ -222,8 +221,6 @@ jobs:
       toolVersion: 'Latest'
       verbosityLevel: silent
       continueOnError: true
-    env:
-      AzureServicesAuthConnectionString: runAs=App;AppId=$(ApiScanClientId)
   # Have to use manual CodeQL Init task for now because the 1ES template auto injected CodeQL contains bug that hangs during pipeline builds.
   - task: MS-CST-E.codeql-3000-release.finalize-task.CodeQL3000Finalize@0
     displayName: CodeQL 3000 Finalize
@@ -263,6 +260,7 @@ jobs:
     displayName: 'Archive TestAdapterForBoostTest on Symweb'
     condition: and(eq (variables.ArchiveSymbols, True), eq('${{ parameters.IsProd }}', true))
     inputs:
+      azureSubscription: 'VSEng-SymbolsUpload'
       SymbolsFeatureName: TestAdapterForBoostTest
       SymbolsProject: VS
       SymbolsAgentPath: '$(Build.ArtifactStagingDirectory)\drop'
