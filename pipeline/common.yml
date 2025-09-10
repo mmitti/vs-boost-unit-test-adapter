@@ -256,7 +256,7 @@ jobs:
       # See the following for more info: https://devdiv.visualstudio.com/DevDiv/_wiki/wikis/DevDiv.wiki/34299/Handling-Symbols
       PublishSymbols: false
     continueOnError: true
-  - task: ms-vseng.MicroBuildShipTasks.0ffdda1d-8c7b-40da-b8b1-061660eaeea3.MicroBuildArchiveSymbols@5
+  - task: ms-vseng.MicroBuildShipTasks.0ffdda1d-8c7b-40da-b8b1-061660eaeea3.MicroBuildArchiveSymbols@6
     displayName: 'Archive TestAdapterForBoostTest on Symweb'
     condition: and(eq (variables.ArchiveSymbols, True), eq('${{ parameters.IsProd }}', true))
     inputs:
