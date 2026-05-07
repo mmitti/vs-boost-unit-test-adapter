@@ -16,7 +16,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Antlr4.Runtime" Version="4.6.6" />
-    <PackageReference Include="log4net" Version="2.0.14" />
+    <PackageReference Include="log4net" Version="2.0.15" />
     <PackageReference Include="Microsoft.VisualStudioEng.MicroBuild.Core" Version="1.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -26,6 +26,10 @@
     </FilesToSign>
     <FilesToSign Include="$(OutDir)\log4net.dll" Condition="'$(RealSign)' == 'True'">
       <Authenticode>3PartySHA2</Authenticode>
+    </FilesToSign>
+    <FilesToSign Include="$(OutDir)\ThirdPartySigning.dll" Condition="'$(RealSign)' == 'True'">
+      <Authenticode>Microsoft400</Authenticode>
+      <StrongName>StrongName</StrongName>
     </FilesToSign>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
