@@ -25,6 +25,7 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <IsProductComponent Condition="'$(ProductComponent)' == 'true'">true</IsProductComponent>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>Icons\Icon.ico</ApplicationIcon>
@@ -42,7 +43,7 @@
     <RootNamespace>BoostUnitTestAdapter</RootNamespace>
     <AssemblyName>BoostUnitTestAdapter</AssemblyName>
     <RuntimeIdentifiers>win</RuntimeIdentifiers>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <GeneratePkgDefFile>false</GeneratePkgDefFile>
     <IncludeAssemblyInVSIXContainer>false</IncludeAssemblyInVSIXContainer>
     <IncludeDebugSymbolsInVSIXContainer>false</IncludeDebugSymbolsInVSIXContainer>
