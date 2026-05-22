@@ -16,7 +16,7 @@ namespace BoostTestAdapter.Discoverers
         public bool IsFileZoneMyComputer(string path)
         {
             var zone = Zone.CreateFromUrl(path);
-            return zone.SecurityZone == System.Security.SecurityZone.MyComputer;
+            return zone.SecurityZone == System.Security.SecurityZone.MyComputer || zone.SecurityZone == System.Security.SecurityZone.Intranet;
         }
     }
 }
